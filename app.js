@@ -10,15 +10,12 @@ const checkIfHasGyroscope = event => {
     const gyroscope = event.alpha || event.beta || event.gamma
 
     if (gyroscope) {
-        window.removeEventListener('deviceorientation', checkIfHasGyroscope)
         showGameModeScreen()
-    } else {
         window.removeEventListener('deviceorientation', checkIfHasGyroscope)
-        gameModeScreen.style.display = 'none'
-        instructions.style.display = 'none'
-        controller.style.display = 'none'
-        configIcon.style.display = 'none'
+    }else{
         startGameLoop()
+        window.removeEventListener('deviceorientation', checkIfHasGyroscope)
+        configIcon.style.display = 'none'
     }
 }
 
