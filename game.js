@@ -235,7 +235,10 @@ const resetGame = () => {
     score.textContent = '00'
     gameOver.style.display = 'none'
     canvas.style.filter = 'none'
-    snake = [{ x: 0, y:0 }]
+    snake = [
+        { x: 0, y:0 },
+        { x: size, y:0 }
+    ]
 
     startGameLoop()
 }
