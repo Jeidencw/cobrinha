@@ -1,0 +1,74 @@
+.container__game-mode{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.card{
+    background-color: rgba(0, 0, 0, .7);
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    border-top: 3px solid gray;
+    border-right: 3px solid #111111;
+    border-left: 3px solid gray;
+    border-bottom: 3px solid #111111;
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 18px;
+}
+
+form{
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+form div, label{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+input[type="radio"] {
+    width: 18px;
+    height: 18px;
+}
+
+.dpan__icon{
+    height: 30px;
+}
+
+form button{
+    background-color: rgba(0, 0, 0, .4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 4px 10px;
+    color: white;
+    border-top: 2px solid gray;
+    border-right: 2px solid#111111;
+    border-left: 2px solid gray;
+    border-bottom: 2px solid #111111;
+}
+
+form button:active{
+    border-top: 2px solid whitesmoke;
+    border-right: 2px solid gray;
+    border-left: 2px solid whitesmoke;
+    border-bottom: 2px solid gray;
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+}
