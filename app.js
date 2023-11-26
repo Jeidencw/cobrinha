@@ -4,6 +4,23 @@ const form = document.querySelector('form')
 const gameModeScreen = document.querySelector('.container__game-mode')
 const controller = document.querySelector('.controller')
 const instructions = document.querySelector('.instructions')
+const configIcon = document.querySelector('.config__icon')
+
+const checkIfHasGyroscope = event => {
+    const gyroscope = event.alpha || event.beta || event.gamma
+
+    if (gyroscope) {
+        window.removeEventListener('deviceorientation', checkIfHasGyroscope)
+        showGameModeScreen()
+    } else {
+        window.removeEventListener('deviceorientation', checkIfHasGyroscope)
+        gameModeScreen.style.display = 'none'
+        instructions.style.display = 'none'
+        controller.style.display = 'none'
+        configIcon.style.display = 'none'
+        startGameLoop()
+    }
+}
 
 const showGameModeScreen = () => {
     gameModeScreen.style.display = 'flex'
@@ -52,5 +69,6 @@ const initialValues = () => {
 
 instructions.addEventListener('click', initialValues)
 form.addEventListener('submit', handleFormSubmit)
+window.addEventListener('deviceorientation', checkIfHasGyroscope)
 
 export default showGameModeScreen
