@@ -7,17 +7,18 @@ const instructions = document.querySelector('.instructions')
 const configIcon = document.querySelector('.config__icon')
 
 const checkIfHasGyroscope = event => {
-    const gyroscope = event.alpha || event.beta || event.gamma
+    const gyroscope = event.rotationRate.alpha || event.rotationRate.beta || event.rotationRate.gamma
 
     if (gyroscope) {
         showGameModeScreen()
-        window.removeEventListener('deviceorientation', checkIfHasGyroscope)
+        window.removeEventListener('devicemotion', checkIfHasGyroscope)
     }else{
         startGameLoop()
-        window.removeEventListener('deviceorientation', checkIfHasGyroscope)
+        window.removeEventListener('devicemotion', checkIfHasGyroscope)
         configIcon.style.display = 'none'
     }
 }
+
 
 const showGameModeScreen = () => {
     gameModeScreen.style.display = 'flex'
@@ -66,6 +67,6 @@ const initialValues = () => {
 
 instructions.addEventListener('click', initialValues)
 form.addEventListener('submit', handleFormSubmit)
-window.addEventListener('deviceorientation', checkIfHasGyroscope)
+window.addEventListener('devicemotion', checkIfHasGyroscope)
 
 export default showGameModeScreen
