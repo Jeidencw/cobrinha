@@ -32,7 +32,7 @@ canvas.height = size * 15
 
 let snake = [
     { x: 0, y:0 },
-    { x: 30, y:0 }
+    { x: size, y:0 }
 ]
 
 const incrementScore = () => {
