@@ -15,8 +15,8 @@ const ctBottom = document.querySelector('.crossBottom')
 const ctRight = document.querySelector('.crossRight')
 const ctLeft = document.querySelector('.crossLeft')
 
-let direction, loopId, size
-let gyroscopeEventListener
+let direction, loopId, size, gyroscopeEventListener
+let canChangeDirection = true
 
 const audio = new Audio('./images/audio.mp3')
 let gameLoopInterval = 280
@@ -31,8 +31,7 @@ canvas.width = size * 15
 canvas.height = size * 15
 
 let snake = [
-    { x: 0, y:0 },
-    { x: size, y:0 }
+    { x: size * 7, y: size * 7 }
 ]
 
 const incrementScore = () => {
@@ -53,9 +52,11 @@ const randomPosition = () => {
 }
 
 const randomColor = () => {
-    const red = randomNumber(0, 255)
-    const green = randomNumber(0, 255)
-    const blue = randomNumber(0, 255)
+    const minColor = 100
+
+    const red = randomNumber(minColor, 255)
+    const green = randomNumber(minColor, 255)
+    const blue = randomNumber(minColor, 255)
 
     return `rgb(${red}, ${green}, ${blue})`
 }
@@ -96,13 +97,13 @@ const drawGrid = () => {
     for(let i = 0; i <= canvas.width; i += size){
         ctx.beginPath()
 
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, canvas.height);
-        ctx.stroke();
+        ctx.moveTo(i, 0)
+        ctx.lineTo(i, canvas.height)
+        ctx.stroke()
 
-        ctx.moveTo(0, i);
-        ctx.lineTo(canvas.width, i);
-        ctx.stroke();
+        ctx.moveTo(0, i)
+        ctx.lineTo(canvas.width, i)
+        ctx.stroke()
     }
 }
 
@@ -146,18 +147,33 @@ const checkCollision = () => {
     }
 }
 
+
 const moveSnake = () => {
-    if(!direction)return
+    if (!direction) return
 
     const head = snake[snake.length - 1]
+    
+    const nextPosition = {
+        'right': { x: head.x + size, y: head.y },
+        'left': { x: head.x - size, y: head.y },
+        'up': { x: head.x, y: head.y - size },
+        'down': { x: head.x, y: head.y + size }
+    }
 
-    if(direction === 'right') snake.push({ x: head.x + size, y: head.y })
-    if(direction === 'left') snake.push({ x: head.x - size, y: head.y })
-    if(direction === 'up') snake.push({ x: head.x, y: head.y - size })
-    if(direction === 'down') snake.push({ x: head.x, y: head.y + size })
+    const proposedPosition = nextPosition[direction]
 
+    if (
+        snake.length > 1 &&
+        snake[snake.length - 2].x === proposedPosition.x &&
+        snake[snake.length - 2].y === proposedPosition.y
+    ) {
+        return
+    }
+
+    snake.push(proposedPosition)
     snake.shift()
 }
+
 
 const gameOverScreen = () => {
     direction = undefined
@@ -177,7 +193,7 @@ export const startGameLoop = () => {
             window.removeEventListener('deviceorientation', gyroscopeEventListener)
         }
     }
-
+    canChangeDirection = true
 }
 
 const addMotionEventListener = (beta, gamma) => {
@@ -194,36 +210,77 @@ export const startGameLoopWithMotion = (beta, gamma) => {
 }
 
 const gameLoop = () => {
-    ctx.clearRect(0, 0, 600, 600);
+    ctx.clearRect(0, 0, 600, 600)
 
-    checkEat();
-    drawFood();
-    drawGrid();
-    moveSnake();
-    drawSnake();
-    checkCollision();
+    checkEat()
+    drawFood()
+    drawGrid()
+    moveSnake()
+    drawSnake()
+    checkCollision()
+}
+
+const changeDirection = (newDirection) => {
+    if (!canChangeDirection) return
+
+    canChangeDirection = false
+
+    const oppositeDirections = {
+        'left': 'right',
+        'right': 'left',
+        'up': 'down',
+        'down': 'up'
+    }
+
+    if (oppositeDirections[newDirection] !== direction) {
+        direction = newDirection
+    }
+
+    setTimeout(() => {
+        canChangeDirection = true
+    }, 100)
+}
+
+const handleDirectionInput = (input) => {
+    if (input === 'ArrowRight') {
+        changeDirection('right')
+    } else if (input === 'ArrowLeft') {
+        changeDirection('left')
+    } else if (input === 'ArrowUp') {
+        changeDirection('up')
+    } else if (input === 'ArrowDown') {
+        changeDirection('down')
+    }
 }
 
 const getKeys = ({ key }) => {
-    if(key === 'ArrowRight' && direction !== 'left') direction = 'right'
-    if(key === 'ArrowLeft' && direction !== 'right') direction = 'left'
-    if(key === 'ArrowUp' && direction !== 'down') direction = 'up'
-    if(key === 'ArrowDown' && direction !== 'up') direction = 'down'
+    handleDirectionInput(key)
 }
 
 const getControllerKeys = ({ target }) => {
-    if(target === ctRight && direction !== 'left') direction = 'right'
-    if(target === ctLeft && direction !== 'right') direction = 'left'
-    if(target === ctTop && direction !== 'down') direction = 'up'
-    if(target === ctBottom && direction !== 'up') direction = 'down'
+    if (target === ctRight) {
+        changeDirection('right')
+    } else if (target === ctLeft) {
+        changeDirection('left')
+    } else if (target === ctTop) {
+        changeDirection('up')
+    } else if (target === ctBottom) {
+        changeDirection('down')
+    }
 }
 
-const getGyroscopeKeyFunction = (event, { beta, gamma }) => { 
-    if(beta - 20 >= event.beta && direction !== 'down') direction = 'up' 
-    if(beta + 20 <= event.beta && direction !== 'up') direction = 'down'
-    if(gamma - 20 >= event.gamma && direction !== 'right') direction = 'left'
-    if(gamma + 20 <= event.gamma && direction !== 'left') direction = 'right'
+const getGyroscopeKeyFunction = (event, { beta, gamma }) => {
+    if (beta - 20 >= event.beta) {
+        changeDirection('up')
+    } else if (beta + 20 <= event.beta) {
+        changeDirection('down')
+    } else if (gamma - 20 >= event.gamma) {
+        changeDirection('left')
+    } else if (gamma + 20 <= event.gamma) {
+        changeDirection('right')
+    }
 }
+
 
 const openConfig = () => {
     direction = undefined
@@ -235,10 +292,7 @@ const resetGame = () => {
     score.textContent = '00'
     gameOver.style.display = 'none'
     canvas.style.filter = 'none'
-    snake = [
-        { x: 0, y:0 },
-        { x: size, y:0 }
-    ]
+    snake = [{ x: size * 7, y: size * 7 }]
 
     startGameLoop()
 }
